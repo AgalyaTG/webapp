@@ -6,7 +6,7 @@ FROM golang:1.12-alpine AS builder
 WORKDIR /app
 
 # Copy go.mod and go.sum files first, then the rest of the app files.
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN go mod tidy
 
 # Copy the rest of the application files.
