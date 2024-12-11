@@ -1,24 +1,32 @@
-# This is a standard Dockerfile for building a Go app.
-# It is a multi-stage build: the first stage compiles the Go source into a binary, and
-#   the second stage copies only the binary into an alpine base.
+# Use official golang base image
+FROM golang:1.12-alpine AS builder
 
-# -- Stage 1 -- #
-# Compile the app.
-FROM golang:1.12-alpine as builder
+# Set working directory
 WORKDIR /app
-# The build context is set to the directory where the repo is cloned.
-# This will copy all files in the repo to /app inside the container.
-# If your app requires the build context to be set to a subdirectory inside the repo, you
-#   can use the source_dir app spec option, see: https://www.digitalocean.com/docs/app-platform/references/app-specification-reference/
+
+# Copy go.mod and go.sum files to the container
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the entire project to the container
 COPY . .
+
+# Build the Go binary
 RUN go build -mod=vendor -o bin/hello
 
-# -- Stage 2 -- #
-# Create the final environment with the compiled binary.
-FROM alpine
-# Install any required dependencies.
+# Use a smaller image for the final build
+FROM alpine:latest
+
+# Install necessary dependencies
 RUN apk --no-cache add ca-certificates
+
+# Set working directory for the final image
 WORKDIR /root/
-# Copy the binary from the builder stage and set it as the default command.
+
+# Copy the built binary from the builder stage
 COPY --from=builder /app/bin/hello /usr/local/bin/
-CMD ["hello"]
+
+# Set entrypoint to the Go binary
+ENTRYPOINT ["/usr/local/bin/hello"]
