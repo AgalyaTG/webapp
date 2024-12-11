@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edureka
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: edureka
+  template:
+    metadata:
+      labels:
+        app: edureka
+    spec:
+      containers:
+        - name: edureka
+          image: agalyatg/webapp:latest
+          ports:
+            - containerPort: 80
