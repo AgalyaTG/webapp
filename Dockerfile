@@ -1,12 +1,12 @@
 # -- Stage 1 -- #
 # Compile the Go app.
-FROM golang:1.12-alpine as builder
+FROM golang:1.12-alpine AS builder
 
 # Set the working directory inside the container.
 WORKDIR /app
 
 # Copy go.mod and go.sum files first, then the rest of the app files.
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod tidy
 
 # Copy the rest of the application files.
